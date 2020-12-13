@@ -1,5 +1,4 @@
 import os
-# MONGO_URI = os.environ.get('MONGO_URI')
 USE_API = True
 API = 'owm'
 BROKER_ADDRESS = '192.168.1.26'
