@@ -1,11 +1,10 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify
 
 from datetime import datetime, timedelta, date, time
 from flask_restful import Api, Resource, abort, fields, marshal_with 
 from flask_pymongo import MongoClient
-from bson.codec_options import CodecOptions
 from weatherkiosk.settings import DB_URI, DATABASE
 import pytz
 
