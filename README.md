@@ -1,6 +1,5 @@
 # weather-kiosk
 
-The reason for writing this program was for 2 reasons.
 I previously wrote the weather kiosk using a raspberry pi with a display to display weather information.
 This has a bit of a different purpose. This will take information from a weather API (Currently OWM) and gleen what information I want.
 It will then present this information through a Flask API for the local network to consume. 
@@ -61,24 +60,6 @@ run.py
 
 ```
 
-
-    
- Note: The minimum that has to be install is python 3 and tkinter. if you don't have a temp
-    sensor for the indoor temp it will just insert a static number of 70 degrees.
-    
-## Raspbery Pi
-In the OS dir there is a file called weather.desktop to add a menu item as well as a image.
-Add the image to:
-```
-/usr/share/pixmaps/
-
-```
-
-Add the weather.desktop file to:
-```
-/usr/share/applications/
-
-```
 
 ## Author
 
