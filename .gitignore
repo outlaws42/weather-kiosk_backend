@@ -16,4 +16,6 @@ idea/*
 .vscode
 weather.json
 forecast.json
+*.swp
+weatherkiosk/*.swp
 

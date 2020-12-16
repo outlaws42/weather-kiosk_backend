@@ -27,10 +27,20 @@ else:
 mongo = MongoClient(DB_URI)
 db = mongo[DATABASE]
 
+
 class GetWeather():
   run_once = 1
 
   def __init__(self):
+    try:
+      while True:
+       self.main()
+       sleep(refresh)
+    except (KeyboardInterrupt) as e:
+        print(e)
+        print('Interupted')
+  
+  def main(self):
     self.weather = Weather()
     self.weather.get_weather_info()
     self.forecast = combine_dict(self.weather.get_forecast())
@@ -41,16 +51,7 @@ class GetWeather():
     # collection read , collection writing, find key, sort key
     self.get_high_low_temp_db('current', 'HighLow', 'updated', 'current_temp')
 
-    # collection read , find key, sort key
-    self.get_high_low_today('current', 'updated', 'current_temp')
-
-    # self.get_latest_db('forecast')
     # self.del_all_collection('HighLow')
-    # print('Check is done')
-    # self.write_weather('HighLow', self.get_high_low('current'))
-
-    # print(self.forecast)
-    # print(self.weather_info)
 
   def write_one_db(self, col, data):
     """ write one to a mongoDB database  """
@@ -71,6 +72,7 @@ class GetWeather():
     collection = db[col]
     collection.delete_many({})
     print(f'Deleted all documents in the {col} collection')
+
 
   def get_high_low_temp_db(self, coll_read, coll_write, find_key, sort_key):
     """ Gets High and Low temp for the day. only between 11:30pm and 12pm """
@@ -126,10 +128,4 @@ class GetWeather():
     return listout
 
 if __name__ == "__main__":
-    try:
-        while True:
             app = GetWeather()    
-            sleep(refresh)
-    except (KeyboardInterrupt) as e:
-        print(e)
-        print('Interupted')

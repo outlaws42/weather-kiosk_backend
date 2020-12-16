@@ -59,7 +59,7 @@ class HistoryYear(Resource):
         'date' :{'$lt' : year_ago_plus, 
         '$gte' : year_ago}}).sort('_id', -1).limit(1)
     result = [doc for doc in response]
-    return jsonify({'HistoryYear' : f"{year_ago_plus}"})
+    return jsonify({'HistoryYear' : f"{result}"})
 
 api.add_resource(HistoryYear, "/history/year")
 
