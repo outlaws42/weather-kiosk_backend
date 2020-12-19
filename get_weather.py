@@ -8,9 +8,13 @@ import pymongo
 from pymongo import MongoClient
 from bson.codec_options import CodecOptions
 import pytz
-from weatherkiosk.settings import DB_URI, DATABASE
+from weatherkiosk.settings import DB_URI, DATABASE, API
 from weatherkiosk.tmod import combine_dict
-from  weatherkiosk.owm import Weather
+if API == 1:
+  from weatherkiosk.wbit import Weather
+else:
+  from weatherkiosk.owm import Weather
+from weatherkiosk.indoor import Indoor
 
 # Refresh rate /////////////////////////////////
 refresh_type = '1'  # 1 = minutes 2 = Seconds
@@ -41,11 +45,13 @@ class GetWeather():
         print('Interupted')
   
   def main(self):
+    self.indoor = Indoor()
+    self.indoor.run()
     self.weather = Weather()
     self.weather.get_weather_info()
     self.forecast = combine_dict(self.weather.get_forecast())
     self.weather_info = combine_dict(self.weather.gleen_info())
-    self.write_one_db('forecast', self.forecast)
+    self.replace_one_db('forecast', self.forecast)
     self.write_one_db('current', self.weather_info)
 
     # collection read , collection writing, find key, sort key
@@ -57,6 +63,11 @@ class GetWeather():
     """ write one to a mongoDB database  """
     collection = db[col]
     collection.insert_one(data)
+  
+  def replace_one_db(self, col, data):
+    """ replace one document in a mongoDB database  """
+    collection = db[col]
+    collection.replace_one({'replace' : 1}, data, True)
   
   def get_latest_db(self, col):
     """ Get the latest document from a mongoDB database by ID  """

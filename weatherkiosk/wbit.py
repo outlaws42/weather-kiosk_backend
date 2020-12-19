@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime, date
 import pytz
 import geopy.geocoders
 from geopy.geocoders import Nominatim
@@ -9,8 +9,7 @@ import logging
 import requests
 import weatherkiosk.tmod as tmod
 from collections import ChainMap
-from weatherkiosk.instance.config import OWM_API_KEY as key
-# from weatherkiosk.instance.config import OWM_API_KEY_FORECAST as key_forecast
+from weatherkiosk.instance.config import WEATHER_BIT_API_KEY as key
 from weatherkiosk.settings import USE_API, ZIP_CODE, UNITS
 logging.basicConfig(
     filename='wu.log', 
@@ -32,20 +31,11 @@ class Weather():
         tmod.add_to_list(self.forecast_precip_day(),forecast_l)
         tmod.add_to_list(self.forecast_code(),forecast_l)
         tmod.add_to_list(self.forecast_datetime(),forecast_l)
-        # tmod.add_to_list({self.forecast_replace(),forecast_l)
         return forecast_l
-    
-    # def combine_dict(self, dict_list):
-    #     """
-    #     Takes a list of dictionarys and combines into one dictionary
-    #     requires from collections import ChainMap and python 3.3 or later
-    #     """
-    #     current = dict(ChainMap(*dict_list))
-    #     return current
 
     def geolocation(self, address):
         try:
-            geolocator = Nominatim(user_agent = "weather")
+            geolocator = Nominatim(user_agent = "weather kiosk")
             location = geolocator.geocode(address)
             addressout = location.address
             addresslist = addressout.split(',')
@@ -61,13 +51,11 @@ class Weather():
     def get_weather_info(self):
         # location = self.geolocation(ZIP_CODE)
         # lat, long, self.city = location
-        lat = 41.232921
-        long = -85.649106
         # print(f" This is the location {location}")
         try:
             if USE_API == True:
-                c = requests.get(f'https://api.openweathermap.org/data/2.5/weather?zip=46725,us&units={UNITS}&appid={key}')
-                f = requests.get(f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={long}&units={UNITS}&exclude=current,alert,minutely,hourly&appid={key}')
+                c = requests.get(f'https://api.weatherbit.io/v2.0/current?&postal_code={ZIP_CODE}&country=US&units=I&key={key}')
+                f = requests.get(f'https://api.weatherbit.io/v2.0/forecast/daily?&postal_code={ZIP_CODE}&country=US&units=I&key={key}')
                 current = c.json()
                 forecast = f.json()
                 tmod.save_json('current.json', current, 'relative')
@@ -80,31 +68,31 @@ class Weather():
         except Exception as e:
            self.current = tmod.open_json('current.json', 'relative')
            logging.info('Collect current error:  ' + str(e))
-           pass
+           print('Collect current error:  ' + str(e))
         
     def gleen_info(self):
         # weather service
         # left weather info
         # brief description of the weather
-        status = {'current_status': self.current['weather'][0]['main']}
-        refresh = {'updated' : datetime.datetime.utcnow()}
+        status = {'current_status': self.current['data'][0]['weather']['description']}
+        refresh = {'updated' : datetime.utcnow()}
 
         # outside temp .
-        outdoor_temp = {'current_temp': round(self.current['main']['temp'])}
+        outdoor_temp = {'current_temp': round(self.current['data'][0]['temp'])}
         
         # wind
-        import_wind_dir = self.current['wind']['deg']
+        import_wind_dir = self.current['data'][0]['wind_dir']
         wind_dir = {'current_wind_dir' : self.degtocompass(import_wind_dir)}
-        wind_speed = {'current_wind_speed': round(self.current['wind']['speed'])}
+        wind_speed = {'current_wind_speed': round(self.current['data'][0]['wind_spd'])}
 
         # Humidity
-        humidity = {'current_humidity' : f"{round(self.current['main']['humidity'])}%"}
+        humidity = {'current_humidity' : f"{round(self.current['data'][0]['rh'])}%"}
         
         # Feels Like
-        feels_like = {'current_feels_like': round(float(self.current['main']['feels_like']))}
+        feels_like = {'current_feels_like': round(float(self.current['data'][0]['app_temp']))}
 
         # Current Icon 
-        current_icon =  {'current_icon' : self.current['weather'][0]['icon']}    
+        current_icon =  {'current_icon' : self.current['data'][0]['weather']['icon']}    
         return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon]
 
     def degtocompass(self, degrees):
@@ -114,19 +102,22 @@ class Weather():
         return direction[(val % 16)]
 
     def forecast_days(self, days =3):
-        # forecast day for 3 days
-        forecast_day = []
+        # forecast day for 3 days. Get day name from date string
+        day_names = []
         for i in range(days):
-            tstamp = self.forecast_in['daily'][i]['dt']
-            day = {f'day{i}_dow' : datetime.datetime.fromtimestamp(tstamp).strftime('%a')}
-            forecast_day.append(day)
-        return forecast_day
+            datestamp = self.forecast_in['data'][i]['datetime']
+            year, month, day = datestamp.split('-')
+            day_name = {f'day{i}_dow' : 
+              date(int(year), int(month), int(day)).strftime('%a')}
+            day_names.append(day_name)
+        return day_names
         
     def forecast_temp(self, days = 3):
         # forecast high / low temp for 3 days    
         forecast = []
         for i in range(days):
-            temp = {f'day{i}_temp' : f"{round(self.forecast_in['daily'][i]['temp']['max'])}{self.degree_sign}/{round(self.forecast_in['daily'][i]['temp']['min'])}{self.degree_sign}"}
+            temp = {f'day{i}_temp' : 
+                    f"{round(self.forecast_in['data'][i]['max_temp'])}{self.degree_sign}/{round(self.forecast_in['data'][i]['min_temp'])}{self.degree_sign}"}
             forecast.append(temp)
         return forecast
     
@@ -134,7 +125,7 @@ class Weather():
         # forecast code is day / night key word starting at index 0 for 3 days
         forecast_day_code = []
         for i in range(days):
-            temp = {f'day{i}_icon' : self.forecast_in['daily'][i]['weather'][0]['icon']}
+            temp = {f'day{i}_icon' : self.forecast_in['data'][i]['weather']['icon']}
             forecast_day_code.append(temp)
         return forecast_day_code
         
@@ -142,14 +133,13 @@ class Weather():
         # pop is day night chance of precip starting at index 0 for 3 days
         forecast_pr = []
         for i in range(days):
-            temp = self.forecast_in['daily'][i]['pop']
-            temp_calc = (float(temp)*100)
-            forecast_pr.append({f'day{i}_pop' : f'{int(temp_calc)}%'})
+            temp = self.forecast_in['data'][i]['pop']
+            forecast_pr.append({f'day{i}_pop' : f'{int(temp)}%'})
         return forecast_pr
         
     def forecast_datetime(self):
         # pop is day night chance of precip starting at index 0 for 3 days
-        forecast_dt = [{"date" : datetime.datetime.utcnow(), 'replace': 1}]
+        forecast_dt = [{"date" : datetime.utcnow()}]
         return forecast_dt
 
 if __name__ == "__main__":

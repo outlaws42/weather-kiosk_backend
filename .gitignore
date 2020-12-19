@@ -14,7 +14,7 @@ temp.txt
 .idea/
 idea/*
 .vscode
-weather.json
+current.json
 forecast.json
 *.swp
 weatherkiosk/*.swp

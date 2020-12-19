@@ -37,6 +37,16 @@ class Current(Resource):
     return jsonify({'current' : f"{result}"})
 api.add_resource(Current, "/current")
 
+# Indoor Class
+class Indoor(Resource):
+  def get(self):
+    collection = db['indoor']
+    response = collection.find().sort("_id", -1).limit(1)
+    result = [doc for doc in response]
+    print(result)
+    return jsonify({'current' : f"{result}"})
+api.add_resource(Indoor, "/indoor")
+
 # History Class
 class History(Resource):
   def get(self):

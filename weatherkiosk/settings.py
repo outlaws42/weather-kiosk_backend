@@ -1,6 +1,6 @@
 import os
 USE_API = True
-API = 'owm'
+API = 0 # 0 = owm, 1 = wbit
 BROKER_ADDRESS = '192.168.1.26'
 ZIP_CODE = '46764'
 TEMP_PAST = 'year'
