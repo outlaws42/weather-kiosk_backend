@@ -2,15 +2,12 @@
 
 # -*- coding: utf-8 -*-
 import datetime
-import pytz
 import geopy.geocoders
 from geopy.geocoders import Nominatim
 import logging
 import requests
 import weatherkiosk.tmod as tmod
-from collections import ChainMap
 from weatherkiosk.instance.config import OWM_API_KEY as key
-# from weatherkiosk.instance.config import OWM_API_KEY_FORECAST as key_forecast
 from weatherkiosk.settings import USE_API, ZIP_CODE, UNITS
 logging.basicConfig(
     filename='wu.log', 
@@ -32,16 +29,8 @@ class Weather():
         tmod.add_to_list(self.forecast_precip_day(),forecast_l)
         tmod.add_to_list(self.forecast_code(),forecast_l)
         tmod.add_to_list(self.forecast_datetime(),forecast_l)
-        # tmod.add_to_list({self.forecast_replace(),forecast_l)
         return forecast_l
     
-    # def combine_dict(self, dict_list):
-    #     """
-    #     Takes a list of dictionarys and combines into one dictionary
-    #     requires from collections import ChainMap and python 3.3 or later
-    #     """
-    #     current = dict(ChainMap(*dict_list))
-    #     return current
 
     def geolocation(self, address):
         try:
@@ -104,7 +93,7 @@ class Weather():
         feels_like = {'current_feels_like': round(float(self.current['main']['feels_like']))}
 
         # Current Icon 
-        current_icon =  {'current_icon' : self.current['weather'][0]['icon']}    
+        current_icon =  {'current_icon' : self.current['weather'][0]['id']}    
         return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon]
 
     def degtocompass(self, degrees):
@@ -134,7 +123,7 @@ class Weather():
         # forecast code is day / night key word starting at index 0 for 3 days
         forecast_day_code = []
         for i in range(days):
-            temp = {f'day{i}_icon' : self.forecast_in['daily'][i]['weather'][0]['icon']}
+            temp = {f'day{i}_icon' : self.forecast_in['daily'][i]['weather'][0]['id']}
             forecast_day_code.append(temp)
         return forecast_day_code
         

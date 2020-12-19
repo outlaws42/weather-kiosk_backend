@@ -2,13 +2,11 @@
 
 # -*- coding: utf-8 -*-
 from datetime import datetime, date
-import pytz
 import geopy.geocoders
 from geopy.geocoders import Nominatim
 import logging
 import requests
 import weatherkiosk.tmod as tmod
-from collections import ChainMap
 from weatherkiosk.instance.config import WEATHER_BIT_API_KEY as key
 from weatherkiosk.settings import USE_API, ZIP_CODE, UNITS
 logging.basicConfig(
@@ -33,25 +31,8 @@ class Weather():
         tmod.add_to_list(self.forecast_datetime(),forecast_l)
         return forecast_l
 
-    def geolocation(self, address):
-        try:
-            geolocator = Nominatim(user_agent = "weather kiosk")
-            location = geolocator.geocode(address)
-            addressout = location.address
-            addresslist = addressout.split(',')
-            if len(address) <= 5:
-                city = addresslist[0]
-            else:
-                city = addresslist[2]
-            return location.latitude, location.longitude, city
-        except Exception as e:
-            print("This is the location from Error {} ".format(e))
-            return 41.232921, -85.649106, "columbia city"
 
     def get_weather_info(self):
-        # location = self.geolocation(ZIP_CODE)
-        # lat, long, self.city = location
-        # print(f" This is the location {location}")
         try:
             if USE_API == True:
                 c = requests.get(f'https://api.weatherbit.io/v2.0/current?&postal_code={ZIP_CODE}&country=US&units=I&key={key}')
@@ -92,7 +73,7 @@ class Weather():
         feels_like = {'current_feels_like': round(float(self.current['data'][0]['app_temp']))}
 
         # Current Icon 
-        current_icon =  {'current_icon' : self.current['data'][0]['weather']['icon']}    
+        current_icon =  {'current_icon' : self.current['data'][0]['weather']['code']}    
         return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon]
 
     def degtocompass(self, degrees):
@@ -125,7 +106,7 @@ class Weather():
         # forecast code is day / night key word starting at index 0 for 3 days
         forecast_day_code = []
         for i in range(days):
-            temp = {f'day{i}_icon' : self.forecast_in['data'][i]['weather']['icon']}
+            temp = {f'day{i}_icon' : self.forecast_in['data'][i]['weather']['code']}
             forecast_day_code.append(temp)
         return forecast_day_code
         
