@@ -31,6 +31,10 @@ else:
 mongo = MongoClient(DB_URI)
 db = mongo[DATABASE]
 
+read_collection = 'current'
+write_collection = 'HighLow'
+key_find = 'updated'
+key_sort = 'current_temp'
 
 class GetWeather():
   run_once = 1
@@ -55,7 +59,12 @@ class GetWeather():
     self.write_one_db('current', self.weather_info)
 
     # collection read , collection writing, find key, sort key
-    self.get_high_low_temp_db('current', 'HighLow', 'updated', 'current_temp')
+    self.get_high_low_temp_db(
+      read_collection,
+      write_collection, 
+      key_find, 
+      key_sort
+      )
 
     # self.del_all_collection('HighLow')
 

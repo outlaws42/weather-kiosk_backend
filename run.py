@@ -53,7 +53,9 @@ class History(Resource):
     today = datetime.combine(date.today(), time())
     tomorrow = today + timedelta(1)
     collection = db['HighLow']
-    response = collection.find({'date' :{'$lt' : tomorrow, '$gte' : today}})
+    response = collection.find({
+      'date' :{'$lt' : tomorrow, 
+      '$gte' : today}})
     results = [doc for doc in response]
     return jsonify({'History' : f"{results}"})
 
@@ -87,7 +89,31 @@ class HistoryDay(Resource):
 
 api.add_resource(HistoryDay, "/history/day")
 
+# Get Certain Day from database Class
+class CollectDate(Resource):
+  def get(self):
+    date_request = '2020-12-19'
+    year, month, day = date_request.split('-')
+    today = datetime.combine(
+      date(int(year), int(month), int(day)), time())
+    tomorrow = today + timedelta(1)
+    collection = db['current']
+    response = collection.find({
+      'updated' :{'$lt' : tomorrow, '$gte' : today}})
+    results = [doc for doc in response]
+    test = self.high_low_list(results, 'updated')
+    return jsonify({'Date' : f"{test}"})
+
+  def high_low_list(self, listin, key):
+    """ sort list by a key in the dictionaries
+        Then get first and last dictionary from the list """
+    listout = []
+    listin.sort(key=lambda item: item.get(key))
+    listout.append(listin[-1])
+    listout.append(listin[0])
+    return listout
+api.add_resource(CollectDate, "/date")
 
 # Run Server
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
