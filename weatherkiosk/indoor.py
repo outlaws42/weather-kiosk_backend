@@ -31,11 +31,11 @@ class Indoor(mqtt.Client):
         # time_now = datetime.datetime.now().strftime("%Y-%m-%d %M.%S")
         time_now = datetime.datetime.utcnow()
         t = {'front_room' : round(float(in_temp)), 'dt' : time_now, 'replace' : 1}
-        self.write_one_db('indoor', t)
+        self.replace_one_db('indoor', t)
 
         # tmod.save_file('temp.txt',t)
     
-    def write_one_db(self, col, data):
+    def replace_one_db(self, col, data):
       """ write one to a mongoDB database  """
       collection = db[col]
       collection.replace_one({'replace' : 1}, data, True)

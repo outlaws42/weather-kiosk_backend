@@ -5,8 +5,8 @@ from datetime import datetime
 import pymongo
 from pymongo import MongoClient
 import logging
-from settings import DB_URI, DATABASE
-import tmod
+from weatherkiosk.settings import DB_URI, DATABASE
+import weatherkiosk.tmod as tmod
 logging.basicConfig(
     filename='wu.log', 
     level=logging.INFO, 

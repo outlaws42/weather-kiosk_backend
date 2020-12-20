@@ -7,7 +7,7 @@ import pymongo
 from pymongo import MongoClient
 from bson.codec_options import CodecOptions
 import pytz
-from settings import DB_URI, DATABASE
+from weatherkiosk.settings import DB_URI, DATABASE
 
 # The date needed for misssing high low temp in string form and 'YYYY-MM-DD'
 missing_date = '2020-12-15' 
