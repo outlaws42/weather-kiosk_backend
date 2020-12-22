@@ -7,7 +7,6 @@ from datetime import datetime, timedelta, date, time
 from flask_restful import Api, Resource 
 from flask_pymongo import MongoClient
 from weatherkiosk.settings import DB_URI, DATABASE
-import pytz
 
 # Init app
 app = Flask(__name__)

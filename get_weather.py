@@ -66,8 +66,6 @@ class GetWeather():
       key_sort
       )
 
-    # self.del_all_collection('HighLow')
-
   def write_one_db(self, col, data):
     """ write one to a mongoDB database  """
     collection = db[col]
@@ -77,22 +75,6 @@ class GetWeather():
     """ replace one document in a mongoDB database  """
     collection = db[col]
     collection.replace_one({'replace' : 1}, data, True)
-  
-  def get_latest_db(self, col):
-    """ Get the latest document from a mongoDB database by ID  """
-    collection = db[col]
-    last = collection.find().sort("_id", -1).limit(1)
-    latest = [doc for doc in last]
-    print(f'The latest from collection {col}')
-    print(latest)
-    return latest 
-
-  def del_all_collection(self, col):
-    """ Delete all documents in a collection from a mongoDB database  """
-    collection = db[col]
-    collection.delete_many({})
-    print(f'Deleted all documents in the {col} collection')
-
 
   def get_high_low_temp_db(self, coll_read, coll_write, find_key, sort_key):
     """ Gets High and Low temp for the day. only between 11:30pm and 12pm """
@@ -105,14 +87,9 @@ class GetWeather():
       high_low = self.get_high_low_today(coll_read, find_key, sort_key)
       self.write_one_db(coll_write, high_low)
       self.run_once = 0
-      print(high_low) 
-      print(f"now = {now}, self.run_once = {self.run_once} ")
-      print(f'write document to the {coll_write} collection via get_high_low_temp_db')
     else:
       if today12am <= now <= today1230am:
         self.run_once = 1
-        print(f"Reset run_once, Date: {now},  self.run_once = {self.run_once}")
-        
 
   def get_doc_today_db(self, col, key):
     """ Gets Documents from today mongoDB database """
@@ -134,8 +111,6 @@ class GetWeather():
               'high' : temp_list[0]['current_temp'], 
               'low' : temp_list[1]['current_temp'], 
               'date' : today}
-    print(high_low)
-
     return high_low
 
   def high_low_list(self, listin, key):
