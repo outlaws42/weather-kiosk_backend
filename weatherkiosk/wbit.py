@@ -120,7 +120,7 @@ class Weather():
         
     def forecast_datetime(self):
         # pop is day night chance of precip starting at index 0 for 3 days
-        forecast_dt = [{"date" : datetime.utcnow()}]
+        forecast_dt = [{"date" : datetime.datetime.utcnow(), 'replace': 1}]
         return forecast_dt
 
 if __name__ == "__main__":

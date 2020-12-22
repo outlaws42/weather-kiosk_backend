@@ -16,6 +16,8 @@ idea/*
 .vscode
 current.json
 forecast.json
+testcurrent.json
+test_api.py
 *.swp
 weatherkiosk/*.swp
 

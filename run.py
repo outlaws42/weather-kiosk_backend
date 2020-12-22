@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-from flask import Flask, jsonify
-
+from flask import Flask
+from bson import json_util
+import json
 from datetime import datetime, timedelta, date, time
 from flask_restful import Api, Resource 
 from flask_pymongo import MongoClient
@@ -17,77 +18,39 @@ mongo = MongoClient(DB_URI)
 db = mongo[DATABASE]
 
 
-# Forecast Class
-class Forecast(Resource):
-  def get(self):
-    collection = db['forecast']
-    last = collection.find().sort("_id", -1).limit(1)
-    result = [doc for doc in last]
-    print(result)
-    return jsonify({'forecast' : f"{result}"})
-api.add_resource(Forecast, "/forecast")
-
-# Current Class
-class Current(Resource):
-  def get(self):
-    collection = db['current']
+# Latest Class
+# /current or /forecast or /indoor
+class Latest(Resource):
+  def get(self,col):
+    collection = db[col]
     response = collection.find().sort("_id", -1).limit(1)
     result = [doc for doc in response]
-    print(result)
-    return jsonify({'current' : f"{result}"})
-api.add_resource(Current, "/current")
+    sterilized = json.loads(json_util.dumps(result))
+    return sterilized
+api.add_resource(Latest, "/<col>")
 
-# Indoor Class
-class Indoor(Resource):
-  def get(self):
-    collection = db['indoor']
-    response = collection.find().sort("_id", -1).limit(1)
-    result = [doc for doc in response]
-    print(result)
-    return jsonify({'current' : f"{result}"})
-api.add_resource(Indoor, "/indoor")
-
-# History Class
+# History 
+# /HighLow/day or /HighLow/year
 class History(Resource):
-  def get(self):
-    today = datetime.combine(date.today(), time())
-    tomorrow = today + timedelta(1)
-    collection = db['HighLow']
+  def get(self,col, past):
+    if past == 'year':
+      days = 366
+    elif past == 'day':
+      days = 1
+    else:
+      days = 0
+    past_days = datetime.combine(
+      date.today(), 
+      time()) - timedelta(days)
+    past_days_plus_one =  past_days + timedelta(1)
+    collection = db[col]
     response = collection.find({
-      'date' :{'$lt' : tomorrow, 
-      '$gte' : today}})
-    results = [doc for doc in response]
-    return jsonify({'History' : f"{results}"})
-
-api.add_resource(History, "/history")
-
-# History Year ago Class
-class HistoryYear(Resource):
-  def get(self):
-    year_ago = datetime.combine(date.today(), time()) - timedelta(366)
-    year_ago_plus =  year_ago + timedelta(1)
-    collection = db['HighLow']
-    response = collection.find({
-        'date' :{'$lt' : year_ago_plus, 
-        '$gte' : year_ago}}).sort('_id', -1).limit(1)
+        'date' :{'$lt' : past_days_plus_one, 
+        '$gte' : past_days}}).sort('_id', -1).limit(1)
     result = [doc for doc in response]
-    return jsonify({'HistoryYear' : f"{result}"})
-
-api.add_resource(HistoryYear, "/history/year")
-
-# History Day ago Class
-class HistoryDay(Resource):
-  def get(self):
-    day_ago = datetime.combine(date.today(), time()) - timedelta(1)
-    day_ago_plus =  day_ago + timedelta(1)
-    collection = db['HighLow']
-    response = collection.find({
-        'date' :{'$lt' : day_ago_plus, 
-        '$gte' : day_ago}}).sort('_id', -1).limit(1)
-    result = [doc for doc in response]
-    return jsonify({'Historyday' : f"{result}"})
-
-api.add_resource(HistoryDay, "/history/day")
+    sterilized = json.loads(json_util.dumps(result))
+    return sterilized
+api.add_resource(History, "/<col>/<past>")
 
 # Run Server
 if __name__ == "__main__":
