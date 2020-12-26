@@ -19,12 +19,27 @@ db = mongo[DATABASE]
 
 # Latest Class
 # /current or /forecast or /indoor
+# class Latest(Resource):
+#   def get(self,col):
+#     collection = db[col]
+#     response = collection.find().sort("_id", -1).limit(1)
+#     result = [doc for doc in response]
+#     sterilized = json.loads(json_util.dumps(result))
+#     return sterilized
+# api.add_resource(Latest, "/<col>")
+
+# /current or /forecast or /indoor
 class Latest(Resource):
   def get(self,col):
     collection = db[col]
     response = collection.find().sort("_id", -1).limit(1)
     result = [doc for doc in response]
-    sterilized = json.loads(json_util.dumps(result))
+    test_dict = {'current' : {}}
+    for key in result[0]:
+      test_dict['current'][key] = result[0][key]
+    # test_dict['current']['humidity'] = result[0]['current_humidity']
+    print(test_dict)
+    sterilized = json.loads(json_util.dumps(test_dict))
     return sterilized
 api.add_resource(Latest, "/<col>")
 

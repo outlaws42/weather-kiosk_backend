@@ -68,6 +68,8 @@ class Weather():
                 self.forecast_in = tmod.open_json('forecast.json','relative')
         except Exception as e:
            self.current = tmod.open_json('current.json', 'relative')
+           self.forecast_in = tmod.open_json('forecast.json','relative')
+           print(f"Collect current error: {str(e)}")
            logging.info('Collect current error:  ' + str(e))
            pass
         

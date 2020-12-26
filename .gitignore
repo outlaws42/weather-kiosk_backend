@@ -18,6 +18,7 @@ current.json
 forecast.json
 testcurrent.json
 test_api.py
+template.py
 *.swp
 weatherkiosk/*.swp
 
