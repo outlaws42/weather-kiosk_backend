@@ -66,16 +66,17 @@ class GetHighLow():
     listout.append(listin[0])
     return listout
 
-  def date_request(self, date_):
-    date_request = date_
+  def datetime_from_str_date(self, str_date):
+    """ Pass string date YYYY-MM-DD  return datetime"""
+    date_request = str_date
     year, month, day = date_request.split('-')
-    wanted_date = datetime.combine(
+    datetime_ = datetime.combine(
       date(int(year), int(month), int(day)), time())
-    return wanted_date
+    return datetime_
 
   def get_doc_today_db(self, col_read, find_key, str_date):
     """ Gets Documents from today mongoDB database """
-    today = self.date_request(str_date)
+    today = self.datetime_from_str_date(str_date)
     tomorrow = today + timedelta(1)
     collection = db[col_read]
     aware_times = collection.with_options(
