@@ -38,9 +38,21 @@ def put_in_dict(root_key, date_key, in_list, date_stamp ):
 # /current or /forecast or /indoor
 class Latest(Resource):
   def get(self,col):
+    if col  == 'current' or col == 'forecast' or col == 'indoor':
+      if col == 'current':
+        date_key = 'updated'
+        root_key = 'current'
+      elif col == 'forecast':
+        date_key = 'date'
+        root_key = 'forecast'
+      elif col == 'indoor':
+        date_key = 'dt'
+        root_key = 'indoor'
+    else:
+      return 404
     result = self.get_latest_with_tz_db(col)
-    date_stamp = timestamp_from_datetime(result[0]['updated'])
-    dict = put_in_dict('current', 'updated', result, date_stamp)
+    date_stamp = timestamp_from_datetime(result[0][date_key])
+    dict = put_in_dict(root_key, date_key, result, date_stamp)
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
   
@@ -60,12 +72,15 @@ api.add_resource(Latest, "/<col>")
 # /HighLow/day or /HighLow/year
 class History(Resource):
   def get(self,col, past):
-    if past == 'year':
-      days = 366
-    elif past == 'day':
-      days = 1
+    if col  == 'HighLow' and past == 'day' or past == 'year':
+      if past == 'year':
+        days = 366
+      elif past == 'day':
+        days = 1
+      else:
+        days = 0
     else:
-      days = 0
+      return 404
     result = self.get_certain_dated_entry_db(col, days)
     date_stamp = timestamp_from_datetime(result[0]['date'])
     dict = put_in_dict(f'forecast_{past}', 'date', result, date_stamp)
