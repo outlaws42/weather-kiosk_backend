@@ -67,70 +67,69 @@ run.py
 
 ### /current
 ```json
-[
-    {
-        "_id": {
-            "$oid": "5fe1d0e7130d9ade63c80713"
-        },
-        "current_feels_like": 27,
-        "current_humidity": "79%",
-        "current_icon": 803,
-        "current_status": "Clouds",
-        "current_temp": 37,
-        "current_wind_dir": "WNW",
-        "current_wind_speed": 11,
-        "updated": {
-            "$date": 1608634599015
-        }
+{
+    "current": {
+        "current_icon": 804,
+        "current_feels_like": 19,
+        "current_humidity": "84%",
+        "current_wind_speed": 4,
+        "current_wind_dir": "WSW",
+        "updated": 1609416061,
+        "current_temp": 26,
+        "current_status": "Clouds"
     }
-]
+}
+
 ```
 
 ### /forecast
 
 ```json
-[
-    {
-        "_id": {
-            "$oid": "5fddccf961cbccf18afd4b08"
-        },
-        "date": {
-            "$date": 1608640035018
-        },
-        "day0_dow": "Tue",
+{
+    "forecast": {
+        "date": 1609411531,
+        "replace": 1,
+        "day2_icon": 500,
+        "day1_icon": 502,
         "day0_icon": 803,
-        "day0_pop": "48%",
-        "day0_temp": "40\u00b0/34\u00b0",
-        "day1_dow": "Wed",
-        "day1_icon": 501,
-        "day1_pop": "100%",
-        "day1_temp": "49\u00b0/34\u00b0",
-        "day2_dow": "Thu",
-        "day2_icon": 601,
         "day2_pop": "100%",
-        "day2_temp": "35\u00b0/16\u00b0",
-        "replace": 1
+        "day1_pop": "100%",
+        "day0_pop": "0%",
+        "day2_temp": "34\u00b0/30\u00b0",
+        "day1_temp": "35\u00b0/27\u00b0",
+        "day0_temp": "32\u00b0/25\u00b0",
+        "day2_dow": "Sat",
+        "day1_dow": "Fri",
+        "day0_dow": "Thu"
     }
-]
+}
+
 ```
 ### /HighLow/day or /HighLow/year
 Current is past day and past year for these to work you have have this data in 
 database or it will return no data.
 
 ```json
-[
-    {
-        "_id": {
-            "$oid": "5fe17885130d9ade63c806fa"
-        },
-        "date": {
-            "$date": 1608508800000
-        },
-        "high": 43,
-        "icon": 804,
-        "low": 32
+{
+    "forecast_day": {
+        "icon": 500,
+        "high": 42,
+        "low": 27,
+        "date": 1609304400
     }
-]
+}
+
+// forecast year
+{
+    "forecast_year": {
+        "icon": 804,
+        "high": 31,
+        "low": 25,
+        "date": 1577768400
+    }
+}
+
+
 ```
 
 ## Author
