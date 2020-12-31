@@ -55,8 +55,10 @@ chmod u+x *.py
 ## To run
 **get_weather.py** will check the weather API every 15 min. This is the main file that
 collects the information for the weather kiosk API.
-**run.py** serves up the flask API for your front end. The best way is to make these a system service that starts at boot time. besides these 2 you will need a system service for the mongoDB database. Ubuntu Linux this is `sudo systemctl enable mongod.service` to enable the installed
-mongoDB database to start at boot time.   
+**run.py** serves up the flask API for your front end. The best way is to make these a system service that starts at boot time. 
+
+Besides these 2 you will need a system service for the mongoDB database. Ubuntu Linux this is `sudo systemctl enable mongod.service` to enable the installed
+mongoDB database to start at boot time.  To install MongoDB server community Edition on Ubuntu you can follow these instructions. [Install MongoDB in Ubuntu](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)   
 ```bash
 get_weather.py
 run.py
