@@ -35,6 +35,14 @@ def put_in_dict(root_key, date_key, in_list, date_stamp ):
   print(dict)
   return dict
 
+def check_for_indoor_negative(dictionary, key):
+  if dictionary['indoor'][key] < 0:
+    print('NEGATIVE NUMBER')
+    dictionary['indoor'][key] = 0
+    print(dictionary)
+  return dictionary
+  
+
 # /current or /forecast or /indoor
 class Latest(Resource):
   def get(self,col):
@@ -53,6 +61,8 @@ class Latest(Resource):
     result = self.get_latest_with_tz_db(col)
     date_stamp = timestamp_from_datetime(result[0][date_key])
     dict = put_in_dict(root_key, date_key, result, date_stamp)
+    if root_key == 'indoor':
+      check_for_indoor_negative(dict, 'front_room')
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
   

@@ -94,9 +94,13 @@ class Weather():
         # Feels Like
         feels_like = {'current_feels_like': round(float(self.current['main']['feels_like']))}
 
+        # Sun Rise/Sun Set
+        sun_rise = {'current_sunrise': self.current['sys']['sunrise']}
+        sun_set = {'current_sunset': self.current['sys']['sunset']}
+
         # Current Icon 
         current_icon =  {'current_icon' : self.current['weather'][0]['id']}    
-        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon]
+        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon, sun_rise, sun_set]
 
     def degtocompass(self, degrees):
         direction = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
