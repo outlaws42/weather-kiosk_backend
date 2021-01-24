@@ -35,10 +35,10 @@ def put_in_dict(root_key, date_key, in_list, date_stamp ):
   print(dict)
   return dict
 
-def check_for_indoor_negative(dictionary, key):
-  if dictionary['indoor'][key] < 0:
+def check_for_indoor_negative(dictionary, root_key, key):
+  if dictionary[root_key][key] < 0:
     print('NEGATIVE NUMBER')
-    dictionary['indoor'][key] = 0
+    dictionary[root_key][key] = 0
     print(dictionary)
   return dictionary
   
@@ -62,7 +62,7 @@ class Latest(Resource):
     date_stamp = timestamp_from_datetime(result[0][date_key])
     dict = put_in_dict(root_key, date_key, result, date_stamp)
     if root_key == 'indoor':
-      check_for_indoor_negative(dict, 'front_room')
+      check_for_indoor_negative(dict, root_key,'front_room')
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
   
@@ -84,18 +84,23 @@ class History(Resource):
   def get(self,col, past):
     if col  == 'HighLow' and past == 'day' or past == 'year':
       if past == 'year':
-        days = 366
+        days = 366 #517
       elif past == 'day':
         days = 1
       else:
         days = 0
     else:
       return 404
-    result = self.get_certain_dated_entry_db(col, days)
-    date_stamp = timestamp_from_datetime(result[0]['date'])
-    dict = put_in_dict(f'forecast_{past}', 'date', result, date_stamp)
+    try:
+      result = self.get_certain_dated_entry_db(col, days)
+      print(f'High_Low Result: ${result}')
+      date_stamp = timestamp_from_datetime(result[0]['date'])
+      dict = put_in_dict(f'forecast_{past}', 'date', result, date_stamp)
+    except:
+      dict = {f'forecast_{past}':{'icon': 0, 'high': 0, 'low': 0,  'date' : 0}}
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
+      
 
   def get_certain_dated_entry_db(self, col, past):
     """ Gets past document by date from today mongoDB 

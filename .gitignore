@@ -21,4 +21,4 @@ test_api.py
 template.py
 *.swp
 weatherkiosk/*.swp
-
+*.swo
