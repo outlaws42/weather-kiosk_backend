@@ -81,8 +81,8 @@ api.add_resource(Latest, "/<col>")
 # History 
 # /HighLow/day or /HighLow/year
 class History(Resource):
-  def get(self,col, past):
-    if col  == 'HighLow' and past == 'day' or past == 'year':
+  def get(self,col,past):
+    if col == 'past' and past == 'day' or past == 'year':
       if past == 'year':
         days = 366 #517
       elif past == 'day':
@@ -90,7 +90,7 @@ class History(Resource):
       else:
         days = 0
     else:
-      return 404
+      return f'404 ${past}'
     try:
       result = self.get_certain_dated_entry_db(col, days)
       print(f'High_Low Result: ${result}')

@@ -32,7 +32,7 @@ mongo = MongoClient(DB_URI)
 db = mongo[DATABASE]
 
 read_collection = 'current'
-write_collection = 'HighLow'
+write_collection = 'past'
 key_find = 'updated'
 key_sort = 'current_temp'
 
