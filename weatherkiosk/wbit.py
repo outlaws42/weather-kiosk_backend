@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # -*- coding: utf-8 -*-
-from datetime import datetime, date
+from datetime import datetime, date, time, timezone
 import geopy.geocoders
 from geopy.geocoders import Nominatim
 import logging
@@ -71,10 +71,25 @@ class Weather():
         
         # Feels Like
         feels_like = {'current_feels_like': round(float(self.current['data'][0]['app_temp']))}
+        
+        # Sun Rise/Sun Set
+        sr = self.utc_ts_from_str_time(self.current['data'][0]['sunrise'])
+        ss = self.utc_ts_from_str_time(self.current['data'][0]['sunset'])
+        sun_rise = {'current_sunrise': sr}
+        sun_set = {'current_sunset': ss}
 
         # Current Icon 
-        current_icon =  {'current_icon' : self.current['data'][0]['weather']['code']}    
-        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon]
+        current_icon = {'current_icon' : self.current['data'][0]['weather']['code']}    
+        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon, sun_rise, sun_set]
+
+    def utc_ts_from_str_time(self, str_time):
+      """ Pass string time HH:MM  return Timestamp today at that time in UTC
+        Requires from datetime import datetime, date, time
+      """
+      hour, minute = str_time.split(':')
+      dt = datetime.combine(date.today(),time(int(hour), int(minute)), tzinfo=timezone.utc)
+      ts = int(dt.timestamp())
+      return ts
 
     def degtocompass(self, degrees):
         direction = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
@@ -120,7 +135,7 @@ class Weather():
         
     def forecast_datetime(self):
         # pop is day night chance of precip starting at index 0 for 3 days
-        forecast_dt = [{"date" : datetime.datetime.utcnow(), 'replace': 1}]
+        forecast_dt = [{"date" : datetime.utcnow(), 'replace': 1}]
         return forecast_dt
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ import pytz
 from weatherkiosk.settings import DB_URI, DATABASE
 
 # The date needed for misssing high low temp in string form and 'YYYY-MM-DD'
-missing_date = '2020-12-25' 
+missing_date = '2021-01-30' 
 
 # Database info
 mongo = MongoClient(DB_URI)
@@ -18,7 +18,7 @@ db = mongo[DATABASE]
 
 # DB collection information for reading and writing
 read_collection = 'current'
-write_collection = 'HighLow'
+write_collection = 'past'
 key_find = 'updated'
 key_sort = 'current_temp'
 
@@ -88,7 +88,7 @@ class GetHighLow():
   def get_high_low_today(self, col_read,find_key, sort_key,str_date):
     today_doc = self.get_doc_today_db(col_read, find_key,str_date)
     temp_list = self.high_low_list(today_doc, sort_key)
-    today = self.date_request(str_date)
+    today = self.datetime_from_str_date(str_date)
     high_low = {
               'icon' : temp_list[0]['current_icon'],
               'high' : temp_list[0]['current_temp'], 
