@@ -16,7 +16,7 @@ requires: python 3.3, Open Weather Map api key, mongoDB database
 
 ## config.py
 You will need to create a dir in weatherkiosk called instance and your config.py.  So it will be like this weatherkiosk/instance/config.py 
-You can get a api key from https://openweathermap.org/  Alternativally you can use the weather bit API. To use weather bit you would need to change the `API` setting in the `settings.py` to 1 as well as get a weather bit API key and put it in the `config.py` file as followes. 
+You can get a api key from https://openweathermap.org/  Alternativally you can use the weather bit API https://www.weatherbit.io/. To use weather bit you would need to change the `API` setting in the `settings.py` to 1 as well as get a weather bit API key and put it in the `config.py` file as follows. 
 
 ```python
 
