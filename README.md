@@ -15,12 +15,13 @@ Right now I am really working on this and it is changing all the time. Currently
 requires: python 3.3, Open Weather Map api key, mongoDB database
 
 ## config.py
-You will need to create a dir in weatherkiosk called instance and your config.py.  So it will be like this weatherkiosk/instance/.config.py 
-You can get a api key from https://openweathermap.org/ 
+You will need to create a dir in weatherkiosk called instance and your config.py.  So it will be like this weatherkiosk/instance/config.py 
+You can get a api key from https://openweathermap.org/  Alternativally you can use the weather bit API. To use weather bit you would need to change the `API` setting in the `settings.py` to 1 as well as get a weather bit API key and put it in the `config.py` file as followes. 
 
 ```python
 
 OWM_API_KEY = 'your_OWM_api_key'
+WEATHER_BIT_API_KEY = 'your_weatherbit_api_key'
 
 ```
 
@@ -70,16 +71,18 @@ run.py
 ### /current
 ```json
 {
-    "current": {
-        "current_icon": 804,
-        "current_feels_like": 19,
-        "current_humidity": "84%",
-        "current_wind_speed": 4,
-        "current_wind_dir": "WSW",
-        "updated": 1609416061,
-        "current_temp": 26,
-        "current_status": "Clouds"
-    }
+  "current": {
+    "current_sunset": 1612220301,
+    "current_sunrise": 1612183956,
+    "current_icon": 804,
+    "current_feels_like": 20,
+    "current_humidity": "88%",
+    "current_wind_speed": 1,
+    "current_wind_dir": "N",
+    "updated": 1612171610,
+    "current_temp": 25,
+    "current_status": "Clouds"
+  }
 }
 
 ```
@@ -107,7 +110,7 @@ run.py
 }
 
 ```
-### /HighLow/day or /HighLow/year
+### /past/day or /past/year
 Current is past day and past year for these to work you have have this data in 
 database or it will return no data.
 
