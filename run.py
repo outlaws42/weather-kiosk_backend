@@ -36,16 +36,39 @@ def put_in_dict(root_key, date_key, in_list, date_stamp ):
   return dict
 
 def check_for_indoor_negative(dictionary, root_key, key):
+  """
+  Checks checks to see if the temp is negative if so it makes it 0
+  """
   if dictionary[root_key][key] < 0:
     print('NEGATIVE NUMBER')
     dictionary[root_key][key] = 0
     print(dictionary)
   return dictionary
-  
+
+def check_for_indoor_time(dictionary, root_key, date_key, temp_key):
+  """
+  Checks to see how much time between now
+  and when the last write to the db
+  if to long then sets to 0
+  """
+  time_stamp = dictionary[root_key][date_key]
+  now = datetime.now()
+  then = datetime.fromtimestamp(time_stamp)
+  tdelta = now - then
+  seconds = tdelta.total_seconds()
+  hour = 60*60
+  print(f"timeDelta: {tdelta}")
+  print(f"seconds: {seconds}")
+  if seconds >= hour:
+    dictionary[root_key][temp_key] = 0
+    print(f"Indoor Dictionary after time check {dictionary}")
+  return dictionary
 
 # /current or /forecast or /indoor
 class Latest(Resource):
   def get(self,col):
+    root_key = ''
+    date_key = ''
     if col  == 'current' or col == 'forecast' or col == 'indoor':
       if col == 'current':
         date_key = 'updated'
@@ -63,6 +86,7 @@ class Latest(Resource):
     dict = put_in_dict(root_key, date_key, result, date_stamp)
     if root_key == 'indoor':
       check_for_indoor_negative(dict, root_key,'front_room')
+      check_for_indoor_time(dict, root_key, date_key,'front_room')
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
   
@@ -93,7 +117,7 @@ class History(Resource):
       return f'404 ${past}'
     try:
       result = self.get_certain_dated_entry_db(col, days)
-      print(f'High_Low Result: ${result}')
+      print(f'High_Low Result: {result}')
       date_stamp = timestamp_from_datetime(result[0]['date'])
       dict = put_in_dict(f'forecast_{past}', 'date', result, date_stamp)
     except:
