@@ -49,8 +49,8 @@ class GetWeather():
         print('Interupted')
   
   def main(self):
-    self.indoor = Indoor()
-    self.indoor.run()
+    # self.indoor = Indoor()
+    # self.indoor.run()
     self.weather = Weather()
     self.weather.get_weather_info()
     self.forecast = combine_dict(self.weather.get_forecast())
