@@ -3,7 +3,8 @@
 I previously wrote the weather kiosk using a raspberry pi with a display to display weather information.
 This has a bit of a different purpose. This will take information from a weather API (Currently OWM) and gleen what information I want.
 It will then present this information through a Flask API for the local network to consume. 
-For me the main display is going to be simalur display  with a 5" or 6" screen that will set a desk. 
+For me the main display is going to be simalur display  with a 5" or 6" screen that will set 
+on a desk. 
 This time I am thinking this display will be a retired phone mounted in a frame running a flutter frontend.
 
 Seperating the frontend from the backend allows for any frontend that can read the created API and display it differently depending on the device it is runnning on.
@@ -15,7 +16,7 @@ Right now I am really working on this and it is changing all the time. Currently
 requires: python 3.3, Open Weather Map api key, mongoDB database
 
 ## config.py
-You will need to create a dir in weatherkiosk called instance and your config.py.  So it will be like this weatherkiosk/instance/config.py 
+You will need to create a dir in weatherkiosk called instance and put in your config.py.  So it will be like this weatherkiosk/instance/config.py 
 You can get a api key from https://openweathermap.org/  Alternativally you can use the weather bit API https://www.weatherbit.io/. To use weather bit you would need to change the `API` setting in the `settings.py` to 1 as well as get a weather bit API key and put it in the `config.py` file as follows. 
 
 ```python
@@ -39,6 +40,13 @@ git clone https://github.com/outlaws42/weather-kiosk_backend.git
 
 
 ```
+Change into the project main dir
+
+```bash
+cd weatherkiosk
+
+```
+
 Then run this command to install the modules needed
 
 ```bash
@@ -56,15 +64,26 @@ chmod u+x *.py
 ## To run
 **get_weather.py** will check the weather API every 15 min. This is the main file that
 collects the information for the weather kiosk API.
-**run.py** serves up the flask API for your front end. The best way is to make these a system service that starts at boot time. 
 
-Besides these 2 you will need a system service for the mongoDB database. Ubuntu Linux this is `sudo systemctl enable mongod.service` to enable the installed
+**indoor.py** Will check the indoor weather sensor every 30 seconds. I seperated this off
+so it could be updated more often then getting the weather info.
+
+**run.py** serves up the flask API for your front end. 
+
+The best way to run these is to make these a system service that starts at boot time. 
+
+Besides these 3 you will need a system service for the mongoDB database. In Linux that uses systemd this is `sudo systemctl enable mongod.service` to enable the installed
 mongoDB database to start at boot time.  To install MongoDB server community Edition on Ubuntu you can follow these instructions. [Install MongoDB in Ubuntu](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)   
+
 ```bash
-get_weather.py
-run.py
+./get_weather.py
+./indoor.py
+./run.py
 
 ```
+
+**Note:** You should be able to run this code on Windows and MacOS as well as long as you have the 
+prerequesites installed. Runing the python files and starting everything at boot time will be different for those platforms but it should be possible.
 
 ## Example API Calls
 

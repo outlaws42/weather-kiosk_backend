@@ -14,7 +14,6 @@ if API == 1:
   from weatherkiosk.wbit import Weather
 else:
   from weatherkiosk.owm import Weather
-from weatherkiosk.indoor import Indoor
 
 # Refresh rate /////////////////////////////////
 refresh_type = '1'  # 1 = minutes 2 = Seconds
