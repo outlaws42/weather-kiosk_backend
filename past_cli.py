@@ -34,7 +34,7 @@ def past(
   sort_key, 
   str_date
   )
-  # self.write_one_db(write_collection,past)
+  write_one_db(write_collection,past)
   print(past) 
   print(f'write document to the {write_collection} collection via get_past_by_date')
 
