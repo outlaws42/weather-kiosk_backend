@@ -85,6 +85,10 @@ mongoDB database to start at boot time.  To install MongoDB server community Edi
 **Note:** You should be able to run this code on Windows and MacOS as well as long as you have the 
 prerequesites installed. Runing the python files and starting everything at boot time will be different for those platforms but it should be possible.
 
+## db_convert.py & high_low_date.py
+
+These 2 files are not needed for the normal running of the server. I used **db_convert.py** to convert a old data dump from a sql database to the mongoDB databse. I use  **high_low_date.py** to get the days high low temp for the date specified if there is a issue for some reason that the automatic high low collection failed. This is rare but it is a tool that can be used to run and collect the high and low for the day and write to the past collection in the database.
+
 ## Example API Calls
 
 ### /current
