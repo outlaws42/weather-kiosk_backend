@@ -22,3 +22,4 @@ template.py
 *.swp
 weatherkiosk/*.swp
 *.swo
+test_info_collect.py

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime
 import geopy.geocoders
 from geopy.geocoders import Nominatim
 import logging
@@ -24,10 +24,10 @@ class Weather():
 
     def get_forecast(self):
         forecast_l = []
-        tmod.add_to_list(self.forecast_days(),forecast_l)
-        tmod.add_to_list(self.forecast_temp(),forecast_l)
-        tmod.add_to_list(self.forecast_precip_day(),forecast_l)
-        tmod.add_to_list(self.forecast_code(),forecast_l)
+        tmod.add_to_list(self.forecast_days(len(self.forecast_in['daily'])),forecast_l)
+        tmod.add_to_list(self.forecast_temp(len(self.forecast_in['daily'])),forecast_l)
+        tmod.add_to_list(self.forecast_precip_day(len(self.forecast_in['daily'])),forecast_l)
+        tmod.add_to_list(self.forecast_code(len(self.forecast_in['daily'])),forecast_l)
         tmod.add_to_list(self.forecast_datetime(),forecast_l)
         return forecast_l
     
@@ -78,29 +78,65 @@ class Weather():
         # left weather info
         # brief description of the weather
         status = {'current_status': self.current['weather'][0]['main']}
-        refresh = {'updated' : datetime.datetime.utcnow()}
+        description = {'current_description': self.current['weather'][0]['description']}
+        city = {'current_city': self.current['name']}
+        timezone = self.current['timezone'] # Seconds from UTC
+        timezone_hour = {'current_timezone':((timezone/60)/60)} # Hours from UTC
+        refresh = {'updated': datetime.utcnow()}
 
         # outside temp .
         outdoor_temp = {'current_temp': round(self.current['main']['temp'])}
-        
+
         # wind
         import_wind_dir = self.current['wind']['deg']
-        wind_dir = {'current_wind_dir' : self.degtocompass(import_wind_dir)}
-        wind_speed = {'current_wind_speed': round(self.current['wind']['speed'])}
+        wind_dir = {'current_wind_dir': self.degtocompass(import_wind_dir)}
+        wind_speed = {'current_wind_speed': round(
+            self.current['wind']['speed'])}
+        try:
+          wind_gust = {'current_wind_gust': round(
+            self.current['wind']['gust'])}
+        except:
+          wind_gust = {'current_wind_gust': 0}
 
         # Humidity
-        humidity = {'current_humidity' : f"{round(self.current['main']['humidity'])}%"}
+        humidity = {
+            'current_humidity': f"{round(self.current['main']['humidity'])}%"}
         
+        # Atmospheric Pressure
+        pressure = {'current_pressure': self.current['main']['pressure']} #  hPa
+
+
         # Feels Like
-        feels_like = {'current_feels_like': round(float(self.current['main']['feels_like']))}
+        feels_like = {'current_feels_like': round(
+            float(self.current['main']['feels_like']))}
 
         # Sun Rise/Sun Set
         sun_rise = {'current_sunrise': self.current['sys']['sunrise']}
         sun_set = {'current_sunset': self.current['sys']['sunset']}
 
-        # Current Icon 
-        current_icon =  {'current_icon' : self.current['weather'][0]['id']}    
-        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon, sun_rise, sun_set]
+        # Visibility
+        visibility = {'visibility': self.current['visibility']}
+
+        # Current Icon
+        current_icon = {'current_icon': self.current['weather'][0]['id']}
+        return [
+          status,
+          description,
+          city,
+          timezone_hour, 
+          outdoor_temp, 
+          refresh, 
+          wind_dir, 
+          wind_speed, 
+          wind_gust, 
+          humidity,
+          pressure, 
+          feels_like, 
+          current_icon, 
+          sun_rise, 
+          sun_set, 
+          visibility,
+        ]
 
     def degtocompass(self, degrees):
         direction = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
@@ -113,7 +149,7 @@ class Weather():
         forecast_day = []
         for i in range(days):
             tstamp = self.forecast_in['daily'][i]['dt']
-            day = {f'day{i}_dow' : datetime.datetime.fromtimestamp(tstamp).strftime('%a')}
+            day = {f'day{i}_dow' : datetime.fromtimestamp(tstamp).strftime('%a')}
             forecast_day.append(day)
         return forecast_day
         
@@ -144,7 +180,7 @@ class Weather():
         
     def forecast_datetime(self):
         # pop is day night chance of precip starting at index 0 for 3 days
-        forecast_dt = [{"date" : datetime.datetime.utcnow(), 'replace': 1}]
+        forecast_dt = [{"date" : datetime.utcnow(), 'replace': 1}]
         return forecast_dt
 
 if __name__ == "__main__":

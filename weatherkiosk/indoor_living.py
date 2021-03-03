@@ -20,7 +20,7 @@ class IndoorLiving(mqtt.Client):
     def on_connect(self, client, userdata, flags, rc):
         #print('Connected with result code {0}'.format(rc))
         # Subscribe (or renew if reconnect).
-        self.subscribe('room/living/temperature')
+        self.subscribe('room/temperature/front')
         self.looping_flag=0
         
     
