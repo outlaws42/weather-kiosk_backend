@@ -3,7 +3,7 @@
 
 # Imports ///////////////////
 from time import sleep
-from weatherkiosk.indoor_living import IndoorLiving
+from weatherkiosk.indoor_temp import IndoorLiving
 
 # Refresh rate /////////////////////////////////
 refresh_type = '2'  # 1 = minutes 2 = Seconds
