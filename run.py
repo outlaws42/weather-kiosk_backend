@@ -8,7 +8,7 @@ import pytz
 from datetime import datetime, timedelta, date, time
 from flask_restful import Api, Resource 
 from flask_pymongo import MongoClient
-from weatherkiosk.settings import DB_URI, DATABASE
+from weatherkiosk.settings import DB_URI, DATABASE, DATABASE2
 
 # Init app
 app = Flask(__name__)
@@ -16,7 +16,8 @@ api = Api(app)
 
 # Database
 mongo = MongoClient(DB_URI)
-db = mongo[DATABASE]
+# db = mongo[DATABASE]
+# db2 = mongo[DATABASE2]
 
 def timestamp_from_datetime(dt):
   """ Convert Datetime to timestamp """
@@ -64,12 +65,14 @@ def check_for_indoor_time(dictionary, root_key, date_key, temp_key):
     print(f"Indoor Dictionary after time check {dictionary}")
   return dictionary
 
-# /current or /forecast or /indoor
+# /weather/current or /weather/forecast or /weather/indoor
 class Latest(Resource):
-  def get(self,col):
+  def get(self,col, database):
+    print(database)
+    db = mongo[database]
     root_key = ''
     date_key = ''
-    if col  == 'current' or col == 'forecast' or col == 'indoor':
+    if col  == 'current' or col == 'forecast' or col == 'indoor' or col == 'sensors':
       if col == 'current':
         date_key = 'updated'
         root_key = 'current'
@@ -79,9 +82,12 @@ class Latest(Resource):
       elif col == 'indoor':
         date_key = 'dt'
         root_key = 'indoor'
+      elif col == 'sensors':
+        date_key = 'dt'
+        root_key = 'sensors'
     else:
       return 404
-    result = self.get_latest_with_tz_db(col)
+    result = self.get_latest_with_tz_db(db, col)
     date_stamp = timestamp_from_datetime(result[0][date_key])
     dict = put_in_dict(root_key, date_key, result, date_stamp)
     if root_key == 'indoor':
@@ -90,7 +96,7 @@ class Latest(Resource):
     sterilized = json.loads(json_util.dumps(dict))
     return sterilized
   
-  def get_latest_with_tz_db(self, col_read):
+  def get_latest_with_tz_db(self, db, col_read):
     """ Gets latest document by _id mongoDB database with 
        local timezone return list with latest document"""
     collection = db[col_read]
@@ -100,15 +106,17 @@ class Latest(Resource):
     results = [doc for doc in response]
     return results
 
-api.add_resource(Latest, "/<col>")
+api.add_resource(Latest, "/<database>/<col>")
 
 # History 
-# /HighLow/day or /HighLow/year
+# /weather/past/day or /weather/past/year
 class History(Resource):
-  def get(self,col,past):
+  def get(self,database,col,past):
+    print(past)
+    db = mongo[database]
     if col == 'past' and past == 'day' or past == 'year':
       if past == 'year':
-        days = 366 #517
+        days = 365 #517
       elif past == 'day':
         days = 1
       else:
@@ -116,7 +124,7 @@ class History(Resource):
     else:
       return f'404 ${past}'
     try:
-      result = self.get_certain_dated_entry_db(col, days)
+      result = self.get_certain_dated_entry_db(db, col, days)
       print(f'High_Low Result: {result}')
       date_stamp = timestamp_from_datetime(result[0]['date'])
       dict = put_in_dict(f'forecast_{past}', 'date', result, date_stamp)
@@ -126,7 +134,7 @@ class History(Resource):
     return sterilized
       
 
-  def get_certain_dated_entry_db(self, col, past):
+  def get_certain_dated_entry_db(self, db, col, past):
     """ Gets past document by date from today mongoDB 
     database with return list with past document"""
     past_days = datetime.combine(
@@ -139,8 +147,8 @@ class History(Resource):
         '$gte' : past_days}},{'icon' : 1,'high': 1, 'low': 1, 'date': 1, '_id' : 0}).sort('_id', -1).limit(1)
     result = [doc for doc in response]
     return result
-api.add_resource(History, "/<col>/<past>")
+api.add_resource(History, "/<database>/<col>/<past>")
 
 # Run Server
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, port=5500, host='0.0.0.0')

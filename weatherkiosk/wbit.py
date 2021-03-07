@@ -24,10 +24,10 @@ class Weather():
 
     def get_forecast(self):
         forecast_l = []
-        tmod.add_to_list(self.forecast_days(),forecast_l)
-        tmod.add_to_list(self.forecast_temp(),forecast_l)
-        tmod.add_to_list(self.forecast_precip_day(),forecast_l)
-        tmod.add_to_list(self.forecast_code(),forecast_l)
+        tmod.add_to_list(self.forecast_days(len(self.forecast_in['data'])),forecast_l)
+        tmod.add_to_list(self.forecast_temp(len(self.forecast_in['data'])),forecast_l)
+        tmod.add_to_list(self.forecast_precip_day(len(self.forecast_in['data'])),forecast_l)
+        tmod.add_to_list(self.forecast_code(len(self.forecast_in['data'])),forecast_l)
         tmod.add_to_list(self.forecast_datetime(),forecast_l)
         return forecast_l
 
@@ -56,6 +56,8 @@ class Weather():
         # left weather info
         # brief description of the weather
         status = {'current_status': self.current['data'][0]['weather']['description']}
+        description = {'current_description': self.current['data'][0]['weather']['description']}
+        city = {'current_city': self.current['data'][0]['city_name']}
         refresh = {'updated' : datetime.utcnow()}
 
         # outside temp .
@@ -65,9 +67,13 @@ class Weather():
         import_wind_dir = self.current['data'][0]['wind_dir']
         wind_dir = {'current_wind_dir' : self.degtocompass(import_wind_dir)}
         wind_speed = {'current_wind_speed': round(self.current['data'][0]['wind_spd'])}
+        wind_gust = {'current_wind_gust': 0}
 
         # Humidity
         humidity = {'current_humidity' : f"{round(self.current['data'][0]['rh'])}%"}
+        
+        # Atmospheric Pressure
+        pressure = {'current_pressure': self.current['data'][0]['pres']} #  hPa
         
         # Feels Like
         feels_like = {'current_feels_like': round(float(self.current['data'][0]['app_temp']))}
@@ -78,9 +84,29 @@ class Weather():
         sun_rise = {'current_sunrise': sr}
         sun_set = {'current_sunset': ss}
 
+         # Visibility
+        visibility = {'visibility': self.current['data'][0]['vis']}
+
+
         # Current Icon 
         current_icon = {'current_icon' : self.current['data'][0]['weather']['code']}    
-        return [status, outdoor_temp, refresh, wind_dir, wind_speed, humidity, feels_like, current_icon, sun_rise, sun_set]
+        return [
+            status,
+            description,
+            city, 
+            outdoor_temp, 
+            refresh, 
+            wind_dir, 
+            wind_speed,
+            wind_gust, 
+            humidity,
+            pressure, 
+            feels_like, 
+            current_icon, 
+            sun_rise, 
+            sun_set,
+            visibility,
+            ]
 
     def utc_ts_from_str_time(self, str_time):
       """ Pass string time HH:MM  return Timestamp today at that time in UTC
